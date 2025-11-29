@@ -22,17 +22,14 @@ jobs:
         - name: "Push to Docker Hub"
           run: | 
             docker push theoafactor/k8sapp
-
-    
-    agent_job: 
-        runs-on: ubuntu-latest
-        steps: 
+            
         - name: "Login to agent machine"
           run: |
             touch sshkeyfile 
             cat ${{ secrets.SSH_KEY }} >> sshkeyfile
             chmod 400 sshkeyfile
             ssh -i ec2-user@3.215.190.25 
+        
             
 
         
