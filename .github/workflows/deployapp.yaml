@@ -1,0 +1,25 @@
+name: Simple app deployment
+on: 
+    push: 
+        branches: 
+        - master
+
+jobs: 
+    deploymentjob: 
+        runs-on: ubuntu-latest
+        steps: 
+        - name: 'Checkout from rep'
+          uses: actions/checkout@v4
+        
+        - name: "Build the dockere image"
+          run: | 
+            docker build -t theoafactor/k8sapp .
+
+        - name: "Login to docker"
+          run: | 
+            docker login -u theoafactor -p 
+
+        - name: "Push to Docker Hub"
+          run: | 
+            docker push theoafactor/k8sapp
+        
