@@ -1,0 +1,40 @@
+#!/bin/bash
+
+## install docker 
+sudo yum update -y
+
+sudo yum install docker -y 
+
+sudo service docker start
+
+sudo usermod -a -G docker ec2-user 
+
+
+
+## install aws-cli
+mkdir ~/.aws
+
+cd ~/.aws
+
+touch credentials
+touch config
+
+echo "[default]
+aws_access_key_id = <your access key id>
+aws_secret_access_key = <your aws secret access key>" >> credentials
+
+echo "[default]
+region = us-east-1" >> config
+
+
+## install kubectl
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/
+
+
+## install eksctl 
+curl --silent --location "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_Linux_amd64.tar.gz" | tar xz -C /tmp
+
+sudo mv /tmp/eksctl /usr/local/bin
+

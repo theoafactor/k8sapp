@@ -1,0 +1,94 @@
+terraform {
+    required_providers {
+      aws = {
+        source = "hashicorp/aws"
+      }
+    }
+}
+
+
+provider "aws" {
+    region = "us-east-1"
+}
+
+resource "aws_security_group" "http" {
+    name = "security_group_for-http"
+    description = "this is basic group http"
+
+    ingress {
+        description = "basic http ingress rule"
+        from_port = 80
+        to_port = 80
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    egress {
+        description = "basic http egress rule"
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+
+    }
+
+}
+
+resource "aws_security_group" "ssh" {
+    name = "security_group_for-ssh"
+    description = "this is basic group ssh"
+
+    ingress {
+        description = "basic ssh ingress rule"
+        from_port = 22
+        to_port = 22
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    egress {
+        description = "basic ssh egress rule"
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+
+    }
+
+}
+
+resource "aws_key_pair" "serverkey" {
+    key_name = "server"
+    public_key = file("/home/astronaut/teachings/kubernetes-class/k8skey.pub")
+}
+
+resource "aws_instance" "k8sserver" {
+    ami = "ami-0fa3fe0fa7920f68e"
+    instance_type = "t3.micro"
+    vpc_security_group_ids = [aws_security_group.ssh.id, aws_security_group.http.id]
+    key_name = aws_key_pair.serverkey.key_name
+    tags = {
+      "Name": "commander"
+      "Description": "server for running k8s commands"
+    }
+
+
+    provisioner "remote-exec" {
+    script = "/home/astronaut/teachings/kubernetes-class/config.sh"
+
+    connection {
+      private_key = file("./k8skey")
+      type = "ssh"
+      user = "ec2-user"
+      host = self.public_ip 
+    }
+
+  }
+
+}
+
+
+output "ip_address" {
+    value = aws_instance.k8sserver.public_ip
+}
+
