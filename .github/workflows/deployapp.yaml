@@ -28,7 +28,7 @@ jobs:
             touch sshkeyfile 
             echo "${{ secrets.SSH_KEY }}" >> sshkeyfile
             chmod 400 sshkeyfile
-            ssh -i sshkeyfile ec2-user@3.215.190.25 
+            ssh -i sshkeyfile  -o StrictHostKeyChecking=no ec2-user@3.215.190.25 
         
             
 
